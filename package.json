@@ -1,0 +1,47 @@
+{
+  "name": "patrimonio-saas",
+  "version": "1.0.0",
+  "description": "SaaS para gestión patrimonial con landing page y suscripciones",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:setup": "node scripts/setup-local-db.js",
+    "db:reset": "node scripts/setup-local-db.js --reset",
+    "db:migrate": "node scripts/migrate-dev.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.0",
+    "@stripe/stripe-js": "^2.4.0",
+    "@types/three": "^0.181.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^9.4.3",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.2.0",
+    "framer-motion": "^12.23.25",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.323.0",
+    "next": "^14.1.0",
+    "next-auth": "^4.24.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "recharts": "^2.10.4",
+    "resend": "^3.1.0",
+    "stripe": "^14.14.0",
+    "three": "^0.181.2",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}

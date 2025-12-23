@@ -1,0 +1,1 @@
+VITE_NEON_DATABASE_URL=postgresql://neondb_owner:npg_grlftCU2Aav7@ep-wispy-block-agtonjdm-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
