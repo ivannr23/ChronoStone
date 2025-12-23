@@ -70,7 +70,7 @@ export default function UsageWidget() {
                     const percentage = getPercentage(item.used, item.max)
                     const nearLimit = isNearLimit(item.used, item.max)
                     const overLimit = isOverLimit(item.used, item.max)
-                    const isUnlimited = item.max === -1
+                    const isUnlimited = Number(item.max) === -1
 
                     const colorClasses = {
                         blue: 'text-blue-500',
@@ -116,10 +116,10 @@ export default function UsageWidget() {
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                                     <div
                                         className={`h-full transition-all duration-300 ${overLimit
-                                                ? 'bg-red-500'
-                                                : nearLimit
-                                                    ? 'bg-yellow-500'
-                                                    : bgColorClasses[item.color as keyof typeof bgColorClasses]
+                                            ? 'bg-red-500'
+                                            : nearLimit
+                                                ? 'bg-yellow-500'
+                                                : bgColorClasses[item.color as keyof typeof bgColorClasses]
                                             }`}
                                         style={{ width: `${Math.min(percentage, 100)}%` }}
                                     />

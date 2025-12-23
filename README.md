@@ -1,166 +1,109 @@
-# ChronoStone - Gestión Patrimonial Inteligente
+<div align="center">
+  <img src="./public/images/chronostone_banner.png" alt="ChronoStone Banner" width="100%">
 
-Sistema SaaS completo para la digitalización, restauración y gestión del patrimonio histórico.
+  # 🏛️ ChronoStone
+  ### *Digitalizing Heritage. Preserving History.*
 
-## 🚀 Características
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
-- **Modelos 3D de alta precisión** - Gestión de escaneos y modelos fotorrealistas
-- **Análisis con IA** - Detección automática de deterioros y patologías
-- **Realidad Aumentada** - Visualización del patrimonio restaurado
-- **TimeMachine4D** - Visualización histórica del patrimonio
-- **Informes automáticos** - Generación de documentación técnica
-- **Colaboración en equipo** - Trabajo en tiempo real
-- **Multi-tenant** - Separación lógica de datos por usuario
+  **ChronoStone** es una plataforma SaaS integral diseñada para la gestión, visualización y preservación digital del patrimonio histórico. Combina potencia de gestión de proyectos con visualización 3D avanzada.
+</div>
+
+---
+
+## ✨ Características Principales
+
+### 📁 Gestión de Proyectos de Restauración
+Control total sobre expedientes, fases y documentación técnica. Diseñado específicamente para los flujos de trabajo de conservación.
+
+### 🎮 Visor 3D Integrado
+Carga y visualiza modelos fotogramétricos de alta resolución directamente en tu navegador. Compatible con los formatos estándar del sector.
+
+### 💰 Gestión de Subvenciones e Inversión
+Monitoriza convocatorias públicas, plazos de solicitud y justificación de fondos en tiempo real para cada monumento.
+
+### 📉 Panel de Control Inteligente
+Estadísticas detalladas, seguimiento de uso y alertas tempranas para el mantenimiento preventivo de bienes culturales.
+
+---
 
 ## 🛠️ Stack Tecnológico
 
-- **Frontend**: Next.js 14 + React 18 + TypeScript
-- **Estilos**: Tailwind CSS
-- **Base de datos**: 
-  - Producción: Neon (PostgreSQL)
-  - Desarrollo: SQLite (local)
-- **Autenticación**: NextAuth.js
-- **Pagos**: Stripe
-- **Email**: Resend
-- **Despliegue**: Netlify
+| Área | Tecnologías |
+| :--- | :--- |
+| **Frontend** | React 18, Next.js 14, Tailwind CSS, Lucide Icons |
+| **Animaciones** | Framer Motion (Transiciones fluidas y micro-interacciones) |
+| **Backend** | Next.js API Routes, NextAuth.js |
+| **Base de Datos** | PostgreSQL (Neon) / SQLite (Development) |
+| **3D Engine** | React Three Fiber / Three.js |
 
-## 📦 Instalación
+---
 
-### Requisitos
+## 🚀 Inicio Rápido
 
-- Node.js 18+
-- npm o yarn
+### Requisitos Previos
+- Node.js (v18+)
+- npm / pnpm / yarn
 
-### Pasos
+### Instalación
 
 1. **Clonar el repositorio**
-```bash
-git clone https://github.com/tu-usuario/chronostone.git
-cd chronostone
-```
+   ```bash
+   git clone https://github.com/ivannr23/ChronoStone.git
+   cd ChronoStone
+   ```
 
 2. **Instalar dependencias**
-```bash
-npm install
+   ```bash
+   npm install
+   ```
+
+3. **Configurar el entorno**
+   Copia el archivo de ejemplo y rellena tus credenciales:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. **Inicializar la Base de Datos**
+   ```bash
+   npm run db:setup
+   npm run db:migrate
+   npm run db:superadmin
+   ```
+
+5. **¡A Correr!**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🏗️ Arquitectura del Sistema
+
+```mermaid
+graph TD
+    A[Cliente - Next.js] --> B[Middleware Auth]
+    B --> C[API Routes]
+    C --> D[Service Layer]
+    D --> E[(PostgreSQL / SQLite)]
+    A --> F[3D Viewer Engine]
+    F --> G[Model Assets]
 ```
 
-3. **Configurar variables de entorno**
-```bash
-cp env.development.example .env.local
-```
+---
 
-4. **Configurar base de datos local (desarrollo)**
-```bash
-npm run setup:db
-```
+## 👨‍💻 Autor
 
-5. **Iniciar servidor de desarrollo**
-```bash
-npm run dev
-```
+**ivannr23**
+- GitHub: [@ivannr23](https://github.com/ivannr23)
+- Email: [ivannavarroramos@gmail.com](mailto:ivannavarroramos@gmail.com)
 
-La aplicación estará disponible en `http://localhost:3000`
+---
 
-## 🔧 Configuración
-
-### Variables de Entorno
-
-```env
-# Base de datos (Neon en producción)
-DATABASE_URL=postgresql://user:pass@host/db
-
-# Autenticación (NextAuth)
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=tu-secreto-generado
-
-# Stripe
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-
-# Email (Resend)
-RESEND_API_KEY=re_...
-RESEND_FROM_EMAIL=noreply@chronostone.es
-```
-
-### Base de Datos Local (SQLite)
-
-El proyecto usa SQLite para desarrollo local, lo que significa:
-- No necesitas instalar ningún servidor de base de datos
-- Los datos se guardan en `dev.db` en la raíz del proyecto
-- La estructura es la misma que Neon (PostgreSQL)
-
-Para reiniciar la base de datos local:
-```bash
-rm dev.db
-npm run setup:db
-```
-
-## 🎨 Sistema de Temas
-
-ChronoStone incluye soporte para modo claro, oscuro y sistema:
-
-- **Claro**: Fondo blanco con texto oscuro
-- **Oscuro**: Fondo gris oscuro con texto claro
-- **Sistema**: Sigue la preferencia del sistema operativo
-
-El toggle de tema está disponible en:
-- Navbar (landing page)
-- Footer
-- Header del dashboard
-
-## 📁 Estructura del Proyecto
-
-```
-chronostone/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Páginas de autenticación
-│   ├── api/               # API routes
-│   ├── dashboard/         # Área privada
-│   └── page.tsx           # Landing page
-├── components/
-│   ├── landing/           # Componentes de landing
-│   ├── providers/         # Context providers
-│   └── ui/                # Componentes reutilizables
-├── database/
-│   └── schema-neon.sql    # Schema SQL
-├── hooks/                 # React hooks
-├── lib/                   # Utilidades y configuración
-└── scripts/               # Scripts de setup
-```
-
-## 🚢 Despliegue
-
-### Netlify
-
-1. Conecta tu repositorio a Netlify
-2. Configura las variables de entorno en Netlify
-3. Crea una base de datos en Neon y conecta con Netlify
-4. Despliega automáticamente con cada push
-
-Ver `DEPLOYMENT-NETLIFY.md` para instrucciones detalladas.
-
-## 📊 Planes y Precios
-
-| Plan | Precio | Proyectos | Modelos | Almacenamiento |
-|------|--------|-----------|---------|----------------|
-| Starter | 49€/mes | 5 | 10 | 10GB |
-| Professional | 99€/mes | Ilimitados | Ilimitados | 50GB |
-| Enterprise | 199€/mes | Ilimitados | Ilimitados | 100GB |
-
-## 🔐 Seguridad
-
-- Autenticación segura con NextAuth.js
-- Encriptación de contraseñas con bcrypt
-- Separación de datos por tenant (Row Level Security)
-- Cumplimiento RGPD
-- Datos alojados en EU
-
-## 📝 Licencia
-
-Copyright © 2024 ChronoStone. Todos los derechos reservados.
-
-## 📧 Contacto
-
-- Email: info@chronostone.es
-- Web: https://chronostone.es
+<div align="center">
+  <sub>Construido con ❤️ para la preservación de nuestra historia digital.</sub>
+</div>

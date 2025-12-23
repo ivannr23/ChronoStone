@@ -73,10 +73,12 @@ export default function ProjectsPage() {
     return <LoadingPage />
   }
 
-  const canCreateProject = projects.length < (limits?.maxProjects || 5)
+  const isUnlimited = Number(limits?.maxProjects) === -1
+  const canCreateProject = isUnlimited || (projects.length < (limits?.maxProjects || 5))
 
-  const handleCreateProject = () => {
+  const handleCreateProject = (e: React.MouseEvent) => {
     if (!canCreateProject) {
+      e.preventDefault()
       toast.error('Has alcanzado el límite de proyectos de tu plan. Actualiza para crear más.')
       return
     }
@@ -98,7 +100,7 @@ export default function ProjectsPage() {
               Mis Proyectos
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {projects.length} de {limits?.maxProjects || 5} proyectos utilizados
+              {projects.length} {isUnlimited ? 'proyectos creados' : `de ${limits?.maxProjects || 5} proyectos utilizados`}
             </p>
           </div>
           <Link
@@ -221,18 +223,23 @@ export default function ProjectsPage() {
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">Proyectos utilizados</span>
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              {projects.length} / {limits?.maxProjects || 5}
+              {projects.length} / {isUnlimited ? '∞' : (limits?.maxProjects || 5)}
             </span>
           </div>
           <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div
               className="bg-primary-500 rounded-full h-2 transition-all duration-500"
-              style={{ width: `${(projects.length / (limits?.maxProjects || 5)) * 100}%` }}
+              style={{ width: isUnlimited ? '100%' : `${(projects.length / (limits?.maxProjects || 5)) * 100}%` }}
             ></div>
           </div>
-          {!canCreateProject && (
+          {!canCreateProject && !isUnlimited && (
             <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
               Has alcanzado el límite. <Link href="/dashboard/billing" className="underline">Actualiza tu plan</Link> para crear más proyectos.
+            </p>
+          )}
+          {isUnlimited && (
+            <p className="text-sm text-primary-600 dark:text-primary-400 mt-2">
+              Tienes proyectos ilimitados en tu plan Enterprise.
             </p>
           )}
         </div>

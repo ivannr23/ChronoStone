@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:setup": "node scripts/setup-local-db.js",
     "db:reset": "node scripts/setup-local-db.js --reset",
-    "db:migrate": "node scripts/migrate-dev.js"
+    "db:migrate": "node scripts/migrate-dev.js",
+    "db:superadmin": "node scripts/create-superadmin.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.0",

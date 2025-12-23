@@ -112,6 +112,7 @@ export default function DashboardLayout({
   }
 
   const trialDaysLeft = getTrialDaysLeft()
+  const isTrialExpired = isTrial && trialDaysLeft === 0
 
   // Determinar si mostrar botón de volver
   const canGoBack = segments.length > 1
@@ -141,9 +142,9 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Trial Banner */}
-      {isTrial && subscription && (
+      {isTrial && subscription && !isTrialExpired && (
         <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white fixed top-0 left-0 right-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -156,6 +157,25 @@ export default function DashboardLayout({
                 className="text-sm font-semibold underline hover:no-underline"
               >
                 Actualizar plan →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Trial Expired Banner */}
+      {isTrialExpired && (
+        <div className="bg-red-600 text-white fixed top-0 left-0 right-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">
+                ⚠️ Tu prueba gratuita ha expirado. Actualiza tu plan para continuar.
+              </p>
+              <Link
+                href="/dashboard/billing"
+                className="bg-white text-red-600 px-4 py-1 rounded-lg text-sm font-semibold hover:bg-red-50"
+              >
+                Actualizar ahora
               </Link>
             </div>
           </div>
@@ -248,11 +268,17 @@ export default function DashboardLayout({
               </div>
             </div>
             {subscription && (
-              <div className="mb-3 px-3 py-2 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20 rounded-lg">
+              <div className={`mb-3 px-3 py-2 rounded-lg ${isTrial && !isTrialExpired ? 'bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20' : 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Plan actual</p>
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 capitalize">
-                  {subscription.plan_id.replace('_', ' ')}
-                  {isTrial && <span className="text-primary-500 ml-1">(trial)</span>}
+                  {isTrialExpired ? (
+                    <span className="text-red-600 dark:text-red-400">Trial expirado</span>
+                  ) : (
+                    <>
+                      {subscription.plan_id.replace('_', ' ')}
+                      {isTrial && !isTrialExpired && <span className="text-primary-500 ml-1">(trial)</span>}
+                    </>
+                  )}
                 </p>
               </div>
             )}
@@ -270,7 +296,7 @@ export default function DashboardLayout({
       {/* Main Content - Con margen para el sidebar fijo */}
       <div className="lg:ml-64 min-h-screen">
         {/* Top Header */}
-        <div className={`bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between sticky z-30 ${(isTrial && subscription) || isPending ? 'top-10 border-b' : 'top-0 border-y'} border-gray-200 dark:border-gray-700`}>
+        <div className={`bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between sticky z-30 top-0 border-b border-gray-200 dark:border-gray-700 ${((isTrial && subscription && !isTrialExpired) || isPending || isTrialExpired) ? '-mt-[38px] pt-[50px]' : ''}`}>
           <div className="flex items-center space-x-4">
             {/* Mobile menu button */}
             <button
@@ -324,7 +350,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Content */}
-        <main className="p-6 lg:p-8">
+        <main className="px-6 lg:px-8 pt-12 pb-6 lg:pt-16 lg:pb-8">
           <PageWrapper>
             {children}
           </PageWrapper>

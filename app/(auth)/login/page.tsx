@@ -71,7 +71,7 @@ export default function LoginPage() {
             ¡Revisa tu email!
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Te hemos enviado un enlace mágico a <strong className="text-gray-900 dark:text-white">{email}</strong>. 
+            Te hemos enviado un enlace mágico a <strong className="text-gray-900 dark:text-white">{email}</strong>.
             Haz clic en el enlace para iniciar sesión.
           </p>
           <button
@@ -191,6 +191,34 @@ export default function LoginPage() {
             <Mail className="h-5 w-5 mr-2" />
             Enviar enlace mágico
           </button>
+
+          {/* Superuser Login (Development Only) */}
+          {process.env.NODE_ENV === 'development' && (
+            <button
+              onClick={async () => {
+                setLoading(true)
+                try {
+                  const result = await signIn('credentials', {
+                    email: 'admin@chronostone.dev',
+                    password: 'superadmin123',
+                    redirect: false,
+                  })
+                  if (result?.ok) {
+                    window.location.href = '/dashboard'
+                  } else {
+                    toast.error('Error al iniciar sesión como superusuario')
+                  }
+                } catch (error) {
+                  toast.error('Error al iniciar sesión')
+                } finally {
+                  setLoading(false)
+                }
+              }}
+              className="w-full mb-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all font-semibold text-sm"
+            >
+              🔑 Entrar como Superusuario (Dev)
+            </button>
+          )}
 
           {/* Sign Up Link */}
           <p className="text-center text-gray-600 dark:text-gray-400">
