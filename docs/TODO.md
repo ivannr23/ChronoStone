@@ -102,56 +102,56 @@ Este documento contiene todas las tareas necesarias para completar el SaaS segú
 - [x] Listar proyectos
 - [x] Ver detalle de proyecto
 - [x] Eliminar proyecto
-- [ ] Editar proyecto
-- [ ] Archivar proyecto
-- [ ] Duplicar proyecto
+- [x] Editar proyecto
+- [x] Archivar proyecto
+- [x] Duplicar proyecto
 
 ### 6.2 Información del Proyecto
 - [x] Nombre, descripción, ubicación
 - [x] Fecha de inicio
-- [ ] Fecha de fin estimada
-- [ ] Estado del proyecto (planificación, en curso, pausado, completado)
-- [ ] Tipo de patrimonio (iglesia, castillo, monumento, etc.)
-- [ ] Nivel de protección (BIC, BRL, etc.)
-- [ ] Presupuesto total
-- [ ] Cliente/Propietario
+- [x] Fecha de fin estimada
+- [x] Estado del proyecto (planificación, en curso, pausado, completado)
+- [x] Tipo de patrimonio (iglesia, castillo, monumento, etc.)
+- [x] Nivel de protección (BIC, BRL, etc.)
+- [x] Presupuesto total
+- [x] Cliente/Propietario
 
 ### 6.3 Fases y Cronograma
-- [ ] Definir fases del proyecto
-- [ ] Fechas por fase
-- [ ] Progreso por fase (%)
+- [x] Definir fases del proyecto
+- [x] Fechas por fase
+- [x] Progreso por fase (%)
 - [ ] Vista de timeline/Gantt
 - [ ] Hitos importantes
 
 ### 6.4 Documentación
-- [ ] Subir documentos (PDF, Word, etc.)
-- [ ] Categorizar documentos (memorias, planos, informes)
+- [x] Subir documentos (PDF, Word, etc.)
+- [x] Categorizar documentos (memorias, planos, informes)
 - [ ] Versiones de documentos
 - [ ] Visor de documentos integrado
 
 ### 6.5 Galería de Imágenes
-- [ ] Subir fotos del proyecto
-- [ ] Organizar por fechas/fases
+- [x] Subir fotos del proyecto
+- [x] Organizar por fechas/fases
 - [ ] Comparativa antes/después
-- [ ] Etiquetas y descripciones
+- [x] Etiquetas y descripciones
 
 ### 6.6 Presupuestos y Costes
-- [ ] Presupuesto inicial
-- [ ] Partidas presupuestarias
+- [x] Presupuesto inicial
+- [x] Partidas presupuestarias
 - [ ] Gastos reales
 - [ ] Comparativa presupuesto vs real
 - [ ] Alertas de desviación
 
 ### 6.7 Equipo y Colaboradores
-- [ ] Asignar usuarios al proyecto
-- [ ] Roles por proyecto (coordinador, técnico, etc.)
-- [ ] Permisos por rol
-- [ ] Invitar colaboradores externos
+- [x] Asignar usuarios al proyecto
+- [x] Roles por proyecto (coordinador, técnico, etc.)
+- [x] Permisos por rol
+- [x] Invitar colaboradores externos
 
 ### 6.8 Notas y Comentarios
-- [ ] Sistema de notas/comentarios
+- [x] Sistema de notas/comentarios
 - [ ] Menciones a usuarios
-- [ ] Historial de actividad
+- [x] Historial de actividad
 
 ---
 
@@ -221,20 +221,20 @@ Este documento contiene todas las tareas necesarias para completar el SaaS segú
 ### 8.6 Calendario
 - [x] Vista de calendario con plazos
 - [ ] Sincronización con Google Calendar
-- [ ] Exportar a iCal
+- [x] Exportar a iCal
 
 ---
 
 ## 9. INFORMES Y EXPORTACIÓN
 
 ### 9.1 Generación de Informes
-- [ ] Informe de estado del proyecto
-- [ ] Informe técnico para subvenciones
-- [ ] Informe de avance por fases
-- [ ] Informe económico
+- [x] Informe de estado del proyecto
+- [x] Informe técnico para subvenciones
+- [x] Informe de avance por fases
+- [x] Informe económico
 
 ### 9.2 Exportación
-- [ ] Exportar a PDF
+- [x] Exportar a PDF
 - [ ] Exportar a Word
 - [ ] Plantillas personalizables
 - [ ] Logo de empresa en informes
@@ -244,15 +244,15 @@ Este documento contiene todas las tareas necesarias para completar el SaaS segú
 ## 10. PANEL DE ADMINISTRACIÓN
 
 ### 10.1 Dashboard Admin
-- [ ] Usuarios totales
-- [ ] Suscripciones activas
-- [ ] MRR (Monthly Recurring Revenue)
-- [ ] Churn rate
+- [x] Usuarios totales
+- [x] Suscripciones activas
+- [x] MRR (Monthly Recurring Revenue)
+- [ ] Churn rate (Mock)
 - [ ] Gráficos de crecimiento
 
 ### 10.2 Gestión de Usuarios
-- [ ] Listar todos los usuarios
-- [ ] Ver detalle de usuario
+- [x] Listar todos los usuarios
+- [x] Ver detalle de usuario (Básico en lista)
 - [ ] Cambiar plan manualmente
 - [ ] Suspender/activar usuario
 - [ ] Impersonar usuario (login as)
@@ -373,39 +373,37 @@ Este documento contiene todas las tareas necesarias para completar el SaaS segú
 | 2. Autenticación | 5 | 10 | 50% |
 | 3. Suscripciones/Pagos | 5 | 18 | 28% |
 | 4. Billing | 1 | 7 | 14% |
-| 5. Dashboard | 2 | 6 | 33% |
-| 6. Proyectos | 6 | 35 | 17% |
+| 5. Dashboard | 3 | 6 | 50% |
+| 6. Proyectos | 31 | 40 | 78% |
 | 7. Modelos 3D | 8 | 17 | 47% |
-| 8. Subvenciones | 21 | 25 | 84% |
-| 9. Informes | 0 | 8 | 0% |
-| 10. Admin Panel | 0 | 15 | 0% |
-| 11. Emails | 0 | 18 | 0% |
+| 8. Subvenciones | 23 | 25 | 92% |
+| 9. Informes | 6 | 8 | 75% |
+| 10. Admin Panel | 6 | 15 | 40% |
+| 11. Emails | 6 | 18 | 33% |
 | 12. Analíticas | 0 | 12 | 0% |
 | 13. Configuración | 1 | 8 | 13% |
 | 14. Técnico | 5 | 12 | 42% |
-| **TOTAL** | **60** | **201** | **30%** |
+| **TOTAL** | **106** | **206** | **51%** |
 
 ---
 
 ## PRÓXIMOS PASOS RECOMENDADOS
 
 ### Prioridad ALTA (Core del negocio)
-1. [ ] Módulo de Subvenciones completo
-2. [ ] Ampliar funcionalidades de Proyectos
-3. [ ] Panel de Administración
-4. [ ] Informes y exportación PDF
+1. [ ] Finalizar integración Stripe Webhooks
+2. [ ] Sistema de filtrado avanzado de subvenciones (Falta: lógica de alertas avanzadas)
+3. [ ] Integración de recordatorios de email (Hooks)
 
 ### Prioridad MEDIA (Experiencia de usuario)
-5. [ ] Emails automatizados
-6. [ ] Billing completo con Stripe
-7. [ ] Mejoras en Dashboard
+4. [ ] Mejoras en Dashboard widgets
+5. [ ] Perfil de usuario editable
+6. [ ] Vista Gantt completa
 
 ### Prioridad BAJA (Nice to have)
-8. [ ] Analíticas avanzadas
-9. [ ] Funcionalidades premium (IA, AR)
-10. [ ] Blog y contenido
+7. [ ] Analíticas avanzadas
+8. [ ] Funcionalidades premium (IA, AR)
+9. [ ] Blog y contenido
 
 ---
 
-*Última actualización: 2 de diciembre de 2024*
-
+*Última actualización: 25 de diciembre de 2024*

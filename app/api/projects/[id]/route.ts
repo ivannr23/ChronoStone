@@ -19,7 +19,9 @@ export async function GET(
     const projectId = params.id
 
     const project = await queryOne(
-      `SELECT * FROM projects WHERE id = $1 AND user_id = $2`,
+      `SELECT DISTINCT p.* FROM projects p
+       LEFT JOIN project_collaborators c ON p.id = c.project_id
+       WHERE p.id = $1 AND (p.user_id = $2 OR c.user_id = $2)`,
       [projectId, userId]
     )
 
@@ -122,7 +124,9 @@ export async function PATCH(
 
     // Verificar que el proyecto pertenece al usuario
     const project = await queryOne(
-      `SELECT id FROM projects WHERE id = $1 AND user_id = $2`,
+      `SELECT p.id FROM projects p
+       LEFT JOIN project_collaborators c ON p.id = c.project_id AND c.user_id = $2
+       WHERE p.id = $1 AND (p.user_id = $2 OR c.role IN ('coordinator', 'technician'))`,
       [projectId, userId]
     )
 

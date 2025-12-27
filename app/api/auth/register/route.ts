@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { registerUser } from '@/lib/auth'
+import { sendWelcomeEmail } from '@/lib/mail'
 
 export async function POST(request: Request) {
   try {
@@ -31,16 +32,21 @@ export async function POST(request: Request) {
 
     const userId = await registerUser(email, password, fullName, plan)
 
+    // Enviar email de bienvenida (no bloquear la respuesta)
+    sendWelcomeEmail(email, fullName).catch((err: any) => {
+      console.error('Error sending welcome email:', err)
+    })
+
     // Solo starter tiene trial
     const hasTrial = plan === 'starter'
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       userId,
       plan,
       hasTrial,
-      message: hasTrial 
-        ? 'Usuario creado. Prueba gratuita de 14 días activada.' 
+      message: hasTrial
+        ? 'Usuario creado. Prueba gratuita de 14 días activada.'
         : 'Usuario creado. Procede al pago para activar tu plan.'
     })
   } catch (error: any) {

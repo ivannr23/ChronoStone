@@ -22,7 +22,9 @@ interface Project {
   name: string
   description: string
   location: string
-  status: 'active' | 'archived' | 'completed'
+  status: string
+  project_status: string
+  progress_percentage: number
   models_count: number
   created_at: string
   updated_at: string
@@ -84,10 +86,20 @@ export default function ProjectsPage() {
     }
   }
 
-  const statusColors = {
-    active: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
-    completed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+  const statusColors: Record<string, string> = {
+    planning: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+    in_progress: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+    paused: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+    completed: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
     archived: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+  }
+
+  const statusLabels: Record<string, string> = {
+    planning: 'Planificación',
+    in_progress: 'En curso',
+    paused: 'Pausado',
+    completed: 'Completado',
+    archived: 'Archivado',
   }
 
   return (
@@ -135,7 +147,9 @@ export default function ProjectsPage() {
               className="pl-10 pr-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none transition-all"
             >
               <option value="all">Todos los estados</option>
-              <option value="active">Activos</option>
+              <option value="planning">Planificación</option>
+              <option value="in_progress">En curso</option>
+              <option value="paused">Pausado</option>
               <option value="completed">Completados</option>
               <option value="archived">Archivados</option>
             </select>
@@ -181,9 +195,8 @@ export default function ProjectsPage() {
                   className="block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all group"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[project.status]}`}>
-                      {project.status === 'active' ? 'Activo' :
-                        project.status === 'completed' ? 'Completado' : 'Archivado'}
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[project.project_status || 'planning'] || statusColors.planning}`}>
+                      {statusLabels[project.project_status || 'planning'] || 'Activo'}
                     </span>
                     <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">
                       <MoreVertical className="h-5 w-5" />
@@ -194,8 +207,21 @@ export default function ProjectsPage() {
                     {project.name}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                    {project.description}
+                    {project.description || 'Sin descripción'}
                   </p>
+
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-gray-500">Progreso</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">{project.progress_percentage || 0}%</span>
+                    </div>
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className="bg-primary-500 h-full transition-all duration-300"
+                        style={{ width: `${project.progress_percentage || 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
 
                   <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                     <div className="flex items-center">

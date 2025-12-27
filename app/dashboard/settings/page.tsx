@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { 
-  User, 
-  Bell, 
-  Shield, 
+import {
+  User,
+  Bell,
+  Shield,
   Save,
   Camera,
   Database,
@@ -36,7 +36,7 @@ export default function SettingsPage() {
   })
 
   const [saving, setSaving] = useState(false)
-  
+
   // BDNS Sync Config
   const [bdnsConfig, setBdnsConfig] = useState({
     canUseAutoSync: false,
@@ -55,13 +55,33 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchBdnsConfig()
+    fetchProfile()
   }, [])
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch('/api/user/profile')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.user) {
+          setFormData({
+            fullName: data.user.full_name || '',
+            email: data.user.email || '',
+            company: data.user.company || '',
+            phone: data.user.phone || '',
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error)
+    }
+  }
 
   const fetchBdnsConfig = async () => {
     try {
       const response = await fetch('/api/grants/sync-config')
       const data = await response.json()
-      
+
       if (response.ok) {
         setBdnsConfig({
           canUseAutoSync: data.canUseAutoSync,
@@ -98,7 +118,7 @@ export default function SettingsPage() {
       })
 
       const data = await response.json()
-      
+
       if (response.ok) {
         toast.success('Configuración de BDNS guardada')
         if (data.nextSync) {
@@ -135,9 +155,27 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    toast.success('Configuración guardada')
-    setSaving(false)
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast.success('Perfil actualizado correctamente')
+        // Opcional: Actualizar sesión en el cliente si fuera necesario, 
+        // pero normalmente requiere recargar o update() de useSession
+      } else {
+        toast.error(data.error || 'Error al actualizar perfil')
+      }
+    } catch (error) {
+      toast.error('Error de conexión')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -246,15 +284,13 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setNotifications({ ...notifications, [item.id]: !notifications[item.id as keyof typeof notifications] })}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
-                  notifications[item.id as keyof typeof notifications] 
-                    ? 'bg-primary-500' 
-                    : 'bg-gray-300 dark:bg-gray-600'
-                }`}
+                className={`relative w-12 h-6 rounded-full transition-colors ${notifications[item.id as keyof typeof notifications]
+                  ? 'bg-primary-500'
+                  : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
               >
-                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  notifications[item.id as keyof typeof notifications] ? 'left-7' : 'left-1'
-                }`} />
+                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${notifications[item.id as keyof typeof notifications] ? 'left-7' : 'left-1'
+                  }`} />
               </button>
             </div>
           ))}
@@ -289,7 +325,7 @@ export default function SettingsPage() {
               Función Premium
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              La sincronización automática con la Base de Datos Nacional de Subvenciones 
+              La sincronización automática con la Base de Datos Nacional de Subvenciones
               está disponible exclusivamente en el plan <strong>Enterprise</strong>.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -315,13 +351,11 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setBdnsConfig(prev => ({ ...prev, enabled: !prev.enabled }))}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
-                  bdnsConfig.enabled ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
-                }`}
+                className={`relative w-12 h-6 rounded-full transition-colors ${bdnsConfig.enabled ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
               >
-                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  bdnsConfig.enabled ? 'left-7' : 'left-1'
-                }`} />
+                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${bdnsConfig.enabled ? 'left-7' : 'left-1'
+                  }`} />
               </button>
             </div>
 
@@ -341,11 +375,10 @@ export default function SettingsPage() {
                       <button
                         key={option.value}
                         onClick={() => setBdnsConfig(prev => ({ ...prev, frequency: option.value }))}
-                        className={`px-4 py-2 rounded-lg transition-colors ${
-                          bdnsConfig.frequency === option.value
-                            ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-2 border-primary-500'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
+                        className={`px-4 py-2 rounded-lg transition-colors ${bdnsConfig.frequency === option.value
+                          ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-2 border-primary-500'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -406,13 +439,11 @@ export default function SettingsPage() {
                     </div>
                     <button
                       onClick={() => setBdnsConfig(prev => ({ ...prev, autoImport: !prev.autoImport }))}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        bdnsConfig.autoImport ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${bdnsConfig.autoImport ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
                     >
-                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        bdnsConfig.autoImport ? 'left-7' : 'left-1'
-                      }`} />
+                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${bdnsConfig.autoImport ? 'left-7' : 'left-1'
+                        }`} />
                     </button>
                   </div>
 
@@ -425,13 +456,11 @@ export default function SettingsPage() {
                     </div>
                     <button
                       onClick={() => setBdnsConfig(prev => ({ ...prev, notifyNew: !prev.notifyNew }))}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        bdnsConfig.notifyNew ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${bdnsConfig.notifyNew ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
                     >
-                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        bdnsConfig.notifyNew ? 'left-7' : 'left-1'
-                      }`} />
+                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${bdnsConfig.notifyNew ? 'left-7' : 'left-1'
+                        }`} />
                     </button>
                   </div>
                 </div>

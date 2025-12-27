@@ -53,6 +53,13 @@ export interface Project {
   start_date: string | null
   end_date: string | null
   is_trial_project: number | boolean
+  project_status?: string
+  heritage_type?: string | null
+  protection_level?: string | null
+  budget?: number | null
+  client_owner?: string | null
+  estimated_end_date?: string | null
+  progress_percentage?: number
   created_at: string
   updated_at: string
 }
@@ -67,6 +74,86 @@ export interface Model3D {
   file_type: string | null
   thumbnail_url: string | null
   processing_status: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectPhase {
+  id: string
+  project_id: string
+  name: string
+  description: string | null
+  start_date: string | null
+  end_date: string | null
+  progress_percentage: number
+  status: 'pending' | 'in_progress' | 'completed' | 'delayed'
+  order_index: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectDocument {
+  id: string
+  project_id: string
+  user_id: string
+  name: string
+  file_url: string
+  file_size: number
+  file_type: string | null
+  category: string
+  created_at: string
+  updated_at: string
+}
+
+export interface BudgetItem {
+  id: string
+  project_id: string
+  category: string
+  description: string
+  amount: number
+  is_real_cost: boolean | number
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectImage {
+  id: string
+  project_id: string
+  user_id: string
+  name: string
+  image_url: string
+  thumbnail_url: string | null
+  file_size: number
+  phase_id: string | null
+  capture_date: string | null
+  description: string | null
+  tags: string | null
+  is_before: boolean | number
+  is_after: boolean | number
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectCollaborator {
+  id: string
+  project_id: string
+  user_id: string | null
+  email: string | null
+  role: 'owner' | 'coordinator' | 'technician' | 'viewer' | 'external'
+  permissions: string | any
+  invited_at: string
+  accepted_at: string | null
+  created_at: string
+}
+
+export interface ProjectNote {
+  id: string
+  project_id: string
+  user_id: string
+  content: string
+  mentioned_users: string | null
+  parent_note_id: string | null
+  user_name?: string
   created_at: string
   updated_at: string
 }
@@ -109,7 +196,7 @@ function getSqliteDb() {
 
 // Generar UUID compatible
 function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0
     const v = c === 'x' ? r : (r & 0x3 | 0x8)
     return v.toString(16)
@@ -118,7 +205,26 @@ function generateUUID(): string {
 
 function sqliteQuery<T>(queryString: string, params: any[] = []): T[] {
   const db = getSqliteDb()
-  
+
+  // Analizar placeholders ($1, $2...) para mapear los parámetros en el orden correcto
+  // Esto simula el comportamiento de Postgres donde $1 siempre es el primer elemento del array,
+  // independientemente de dónde y cuántas veces aparezca en la query.
+  const matches = Array.from(queryString.matchAll(/\$(\d+)/g));
+  let orderedParams: any[] = [];
+
+  if (matches.length > 0) {
+    // Si hay placeholders $N, reordenamos los params para que coincidan con el orden de aparición (?)
+    // Ejemplo: "SELECT * FROM t WHERE b = $2 AND a = $1" con params [A, B]
+    // SQLite espera: "SELECT * FROM t WHERE b = ? AND a = ?" con params [B, A]
+    orderedParams = matches.map(match => {
+      const index = parseInt(match[1], 10) - 1; // $1 es índice 0
+      return params[index];
+    });
+  } else {
+    // Si no hay placeholders $N (o usa ? directos), pasamos los params tal cual
+    orderedParams = [...params];
+  }
+
   // Convertir sintaxis PostgreSQL a SQLite
   let sqliteQueryStr = queryString
     // $1, $2 -> ?
@@ -130,7 +236,7 @@ function sqliteQuery<T>(queryString: string, params: any[] = []): T[] {
     // boolean true/false en query string -> 1/0
     .replace(/\btrue\b/gi, '1')
     .replace(/\bfalse\b/gi, '0')
-  
+
   // Reemplazar gen_random_uuid() o uuid_generate_v4() con UUID generado
   while (sqliteQueryStr.includes('gen_random_uuid()') || sqliteQueryStr.includes('uuid_generate_v4()')) {
     sqliteQueryStr = sqliteQueryStr
@@ -139,17 +245,17 @@ function sqliteQuery<T>(queryString: string, params: any[] = []): T[] {
   }
 
   // Convertir parámetros: booleanos a 0/1, undefined a null
-  const sqliteParams = params.map(param => {
+  const sqliteParams = orderedParams.map(param => {
     if (param === true) return 1
     if (param === false) return 0
     if (param === undefined) return null
     return param
   })
-  
+
   try {
     const isSelect = sqliteQueryStr.trim().toUpperCase().startsWith('SELECT')
     const stmt = db.prepare(sqliteQueryStr)
-    
+
     if (isSelect) {
       return stmt.all(...sqliteParams) as T[]
     } else {

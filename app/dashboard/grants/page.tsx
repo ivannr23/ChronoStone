@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   Heart,
   ExternalLink,
   Calendar,
@@ -108,7 +108,7 @@ export default function GrantsPage() {
   const [syncSearchTerm, setSyncSearchTerm] = useState('patrimonio cultural')
   const [importingJson, setImportingJson] = useState(false)
   const jsonInputRef = useRef<HTMLInputElement>(null)
-  
+
   // Filtros
   const [search, setSearch] = useState('')
   const [region, setRegion] = useState('all')
@@ -116,7 +116,9 @@ export default function GrantsPage() {
   const [heritageType, setHeritageType] = useState('all')
   const [minAmount, setMinAmount] = useState('')
   const [maxAmount, setMaxAmount] = useState('')
-  
+  const [year, setYear] = useState('all')
+  const [status, setStatus] = useState('active')
+
   // Paginación
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -132,12 +134,14 @@ export default function GrantsPage() {
       if (heritageType !== 'all') params.append('heritageType', heritageType)
       if (minAmount) params.append('minAmount', minAmount)
       if (maxAmount) params.append('maxAmount', maxAmount)
+      if (year !== 'all') params.append('year', year)
+      if (status !== 'all') params.append('status', status)
       params.append('page', page.toString())
-      params.append('status', 'active')
+      params.append('status', status === 'all' ? 'active' : status)
 
       const response = await fetch(`/api/grants?${params}`)
       const data = await response.json()
-      
+
       if (response.ok) {
         setGrants(data.grants || [])
         setTotalPages(data.pagination?.totalPages || 1)
@@ -151,7 +155,7 @@ export default function GrantsPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, region, organizationType, heritageType, minAmount, maxAmount, page])
+  }, [search, region, organizationType, heritageType, minAmount, maxAmount, year, status, page])
 
   const syncWithBDNS = async () => {
     setSyncing(true)
@@ -159,13 +163,13 @@ export default function GrantsPage() {
       const response = await fetch('/api/grants/sync-bdns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           searchTerm: syncSearchTerm,
-          soloAbiertas: true 
+          soloAbiertas: true
         })
       })
       const data = await response.json()
-      
+
       if (data.bdnsUnavailable) {
         // BDNS no disponible - mostrar mensaje informativo
         if (data.needsToken) {
@@ -179,7 +183,7 @@ export default function GrantsPage() {
         }
         return
       }
-      
+
       if (response.ok) {
         if (data.imported > 0) {
           toast.success(`Se han importado ${data.imported} nuevas subvenciones de la BDNS`)
@@ -211,15 +215,15 @@ export default function GrantsPage() {
     try {
       const text = await file.text()
       const jsonData = JSON.parse(text)
-      
+
       const response = await fetch('/api/grants/import-json', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonData)
       })
-      
+
       const data = await response.json()
-      
+
       if (response.ok) {
         toast.success(data.message || `Se importaron ${data.imported} convocatorias`, {
           duration: 5000
@@ -268,7 +272,7 @@ export default function GrantsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ grantId })
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setFavorites(prev => {
@@ -295,9 +299,9 @@ export default function GrantsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ grantId: grant.id })
       })
-      
+
       const data = await response.json()
-      
+
       if (response.ok) {
         toast.success('Solicitud creada')
         window.location.href = `/dashboard/grants/applications/${data.applicationId}`
@@ -329,10 +333,12 @@ export default function GrantsPage() {
     setHeritageType('all')
     setMinAmount('')
     setMaxAmount('')
+    setYear('all')
+    setStatus('active')
     setPage(1)
   }
 
-  const hasActiveFilters = region !== 'all' || organizationType !== 'all' || heritageType !== 'all' || minAmount || maxAmount
+  const hasActiveFilters = region !== 'all' || organizationType !== 'all' || heritageType !== 'all' || minAmount !== '' || maxAmount !== '' || year !== 'all' || status !== 'active'
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -358,11 +364,19 @@ export default function GrantsPage() {
             </button>
             <Link
               href="/dashboard/grants/alerts"
-              className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
               <Bell className="h-4 w-4" />
               Alertas
             </Link>
+            <a
+              href="/api/grants/export-calendar"
+              download
+              className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              <Calendar className="h-4 w-4" />
+              Exportar Calendario
+            </a>
           </div>
         </div>
 
@@ -425,17 +439,16 @@ export default function GrantsPage() {
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-3 border rounded-lg transition-colors ${
-              showFilters || hasActiveFilters
-                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
-            }`}
+            className={`flex items-center gap-2 px-4 py-3 border rounded-lg transition-colors ${showFilters || hasActiveFilters
+              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
+              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+              }`}
           >
             <Filter className="h-5 w-5" />
             Filtros
             {hasActiveFilters && (
               <span className="bg-primary-500 text-white text-xs px-2 py-0.5 rounded-full">
-                {[region !== 'all', organizationType !== 'all', heritageType !== 'all', !!minAmount, !!maxAmount].filter(Boolean).length}
+                {[region !== 'all', organizationType !== 'all', heritageType !== 'all', !!minAmount, !!maxAmount, year !== 'all', status !== 'active'].filter(Boolean).length}
               </span>
             )}
             <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
@@ -512,6 +525,35 @@ export default function GrantsPage() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Año
+                </label>
+                <select
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="all">Cualquier año</option>
+                  {[2025, 2024, 2023].map(y => (
+                    <option key={y} value={y.toString()}>{y}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Estado
+                </label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="active">Abiertas</option>
+                  <option value="closed">Cerradas</option>
+                  <option value="all">Todas</option>
+                </select>
+              </div>
             </div>
             {hasActiveFilters && (
               <button
@@ -538,7 +580,7 @@ export default function GrantsPage() {
             No hay subvenciones
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {hasActiveFilters 
+            {hasActiveFilters
               ? 'No se encontraron subvenciones con los filtros seleccionados'
               : 'Importa subvenciones desde la Base de Datos Nacional de Subvenciones (BDNS)'
             }
@@ -567,15 +609,14 @@ export default function GrantsPage() {
             const daysLeft = getDaysUntilDeadline(grant.call_close_date)
             const isFavorite = favorites.has(grant.id)
             const isUrgent = daysLeft !== null && daysLeft <= 15 && daysLeft >= 0
-            
+
             return (
               <div
                 key={grant.id}
-                className={`bg-white dark:bg-gray-800 rounded-xl border transition-all hover:shadow-lg ${
-                  isUrgent 
-                    ? 'border-amber-300 dark:border-amber-600' 
-                    : 'border-gray-200 dark:border-gray-700'
-                }`}
+                className={`bg-white dark:bg-gray-800 rounded-xl border transition-all hover:shadow-lg ${isUrgent
+                  ? 'border-amber-300 dark:border-amber-600'
+                  : 'border-gray-200 dark:border-gray-700'
+                  }`}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between gap-4">
@@ -629,17 +670,16 @@ export default function GrantsPage() {
                             {grant.min_amount && grant.max_amount
                               ? `${formatCurrency(grant.min_amount)} - ${formatCurrency(grant.max_amount)}`
                               : grant.max_amount
-                              ? `Hasta ${formatCurrency(grant.max_amount)}`
-                              : `Desde ${formatCurrency(grant.min_amount)}`
+                                ? `Hasta ${formatCurrency(grant.max_amount)}`
+                                : `Desde ${formatCurrency(grant.min_amount)}`
                             }
                           </div>
                         )}
                         {grant.call_close_date && (
-                          <div className={`flex items-center gap-1 ${
-                            isUrgent ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-gray-600 dark:text-gray-400'
-                          }`}>
+                          <div className={`flex items-center gap-1 ${isUrgent ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-gray-600 dark:text-gray-400'
+                            }`}>
                             <Calendar className="h-4 w-4" />
-                            {daysLeft !== null && daysLeft >= 0 
+                            {daysLeft !== null && daysLeft >= 0
                               ? `Cierra en ${daysLeft} días`
                               : 'Plazo cerrado'
                             }
@@ -652,16 +692,15 @@ export default function GrantsPage() {
                     <div className="flex flex-col items-end gap-2 shrink-0">
                       <button
                         onClick={() => toggleFavorite(grant.id)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          isFavorite
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
+                        className={`p-2 rounded-lg transition-colors ${isFavorite
+                          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
                         title={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
                       >
                         {isFavorite ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
                       </button>
-                      
+
                       {daysLeft !== null && daysLeft >= 0 && (
                         <button
                           onClick={() => startApplication(grant)}
@@ -749,9 +788,9 @@ export default function GrantsPage() {
               </div>
               <p className="text-sm text-green-700 dark:text-green-300 mb-3">
                 Descarga el JSON de convocatorias desde{' '}
-                <a 
-                  href="https://www.pap.hacienda.gob.es/bdnstrans/GE/es/convocatorias" 
-                  target="_blank" 
+                <a
+                  href="https://www.pap.hacienda.gob.es/bdnstrans/GE/es/convocatorias"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="underline font-medium"
                 >
@@ -759,7 +798,7 @@ export default function GrantsPage() {
                 </a>
                 {' '}y súbelo aquí.
               </p>
-              
+
               <input
                 ref={jsonInputRef}
                 type="file"
@@ -797,7 +836,7 @@ export default function GrantsPage() {
                 <Database className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 <span className="font-medium text-gray-700 dark:text-gray-300">Buscar via API (puede requerir autenticación)</span>
               </div>
-              
+
               <div className="mt-3">
                 <input
                   type="text"
@@ -807,7 +846,7 @@ export default function GrantsPage() {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 />
               </div>
-              
+
               <button
                 onClick={syncWithBDNS}
                 disabled={syncing || !syncSearchTerm.trim()}

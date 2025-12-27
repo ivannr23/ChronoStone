@@ -20,6 +20,16 @@ export async function GET() {
     )
     const projectsCount = parseInt((projectsResult[0] as any)?.count || '0')
 
+    // Desglose por estado de proyecto
+    const statusResult = await query(
+      `SELECT project_status, COUNT(*) as count FROM projects WHERE user_id = $1 GROUP BY project_status`,
+      [userId]
+    )
+    const projectStatusBreakdown = (statusResult as any[]).reduce((acc, curr) => {
+      acc[curr.project_status || 'planning'] = parseInt(curr.count)
+      return acc
+    }, {} as Record<string, number>)
+
     // Obtener conteo de modelos 3D
     const modelsResult = await query(
       `SELECT COUNT(*) as count FROM models_3d WHERE user_id = $1`,
@@ -77,7 +87,8 @@ export async function GET() {
       stats: {
         projects: projectsCount,
         models: modelsCount,
-        storage: storageUsedMB
+        storage: storageUsedMB,
+        projectStatusBreakdown
       },
       recentActivity: allActivity
     })

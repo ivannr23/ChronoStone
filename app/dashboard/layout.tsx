@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import ThemeToggle from '@/components/ui/ThemeToggle'
 import PageWrapper from '@/components/ui/PageWrapper'
+import OnboardingTour from '@/components/dashboard/OnboardingTour'
 
 // Nombres de rutas para breadcrumbs
 const routeNames: Record<string, string> = {
@@ -233,6 +234,7 @@ export default function DashboardLayout({
               return (
                 <Link
                   key={item.name}
+                  id={`nav-${item.name.toLowerCase().replace(/ /g, '-')}`}
                   href={item.href}
                   className={`
                     flex items-center px-4 py-3 rounded-lg transition-colors duration-150
@@ -253,7 +255,7 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Profile */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div id="user-profile-section" className="p-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white font-semibold">
                 {user?.name?.charAt(0) || user?.email?.charAt(0).toUpperCase()}
@@ -364,6 +366,7 @@ export default function DashboardLayout({
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      <OnboardingTour />
     </div>
   )
 }

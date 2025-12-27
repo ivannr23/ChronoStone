@@ -55,6 +55,7 @@ export default function DashboardPage() {
     projects: 0,
     models: 0,
     storage: 0,
+    projectStatusBreakdown: {} as Record<string, number>
   })
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [loading, setLoading] = useState(true)
@@ -217,8 +218,8 @@ export default function DashboardPage() {
                         className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       >
                         <div className={`p-2 rounded-lg ${activity.type === 'project'
-                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                            : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                          : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
                           }`}>
                           {activity.type === 'project' ? (
                             <FolderOpen className="h-5 w-5" />
@@ -277,9 +278,43 @@ export default function DashboardPage() {
 
       {/* Sidebar */}
       <div className="space-y-6">
-        {/* Usage Widget */}
         <FadeIn delay={0.2}>
           <UsageWidget />
+        </FadeIn>
+
+        {/* Project Stats Distribution */}
+        <FadeIn delay={0.25}>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+              Estado de Proyectos
+            </h3>
+            <div className="space-y-3">
+              {[
+                { label: 'En Planificación', key: 'planning', color: 'bg-blue-500' },
+                { label: 'En Curso', key: 'active', color: 'bg-green-500' },
+                { label: 'Completados', key: 'completed', color: 'bg-purple-500' },
+                { label: 'Pausados', key: 'paused', color: 'bg-orange-500' },
+              ].map(status => {
+                const count = stats.projectStatusBreakdown?.[status.key] || 0
+                const percentage = stats.projects > 0 ? (count / stats.projects) * 100 : 0
+
+                return (
+                  <div key={status.key}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600 dark:text-gray-400">{status.label}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{count}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${status.color} transition-all duration-500`}
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </FadeIn>
 
         {/* Quick Stats */}
@@ -318,6 +353,6 @@ export default function DashboardPage() {
           </div>
         </FadeIn>
       </div>
-    </div>
+    </div >
   )
 }
